@@ -3,16 +3,15 @@ package controller;
 import model.Aluno;
 import model.AlunoDAO;
 import model.RemocaoAlunoDAO;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.*;
 
 public class AlunoController {
-    private List<Aluno> listaAlunos = new ArrayList<>();
+    private static List<Aluno> listaAlunos = new ArrayList<>();
     private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-    private final String csvFile = "ListagemAlunos.txt";
+    private final String csvFile = "ListagemAlunos.csv";
 
         public Aluno criarAluno(String matricula, String nome, int idade, String dataNascimento, String telefone, String cpf) throws ParseException {
         Aluno a = new Aluno();
@@ -31,12 +30,12 @@ public class AlunoController {
             }
         }
         listaAlunos.add(a);
-        salvarEmCSV();
+        salvarEmCSV(a);
     }
 
     public Aluno buscarAlunoPorMatricula(String matricula) {
         for (Aluno a : listaAlunos) {
-            if (a.getMatricula().equals(matricula)) {
+            if (a.getMatricula().trim().equalsIgnoreCase(matricula.trim())) {
                 return a;
             }
         }
@@ -48,7 +47,7 @@ public class AlunoController {
         if (alvo != null) {
             AlunoDAO dao = new RemocaoAlunoDAO();
             listaAlunos = dao.removerAluno(listaAlunos, alvo);
-            salvarEmCSV();
+            salvarTudoEmCSV();
         }
     }
 
@@ -67,17 +66,25 @@ public class AlunoController {
     public void inserirAlunoNaPosicao(int posicao, Aluno aluno) {
         if (aluno != null && posicao >= 0 && posicao <= listaAlunos.size()) {
             listaAlunos.add(posicao, aluno);
-            salvarEmCSV();
+            salvarTudoEmCSV();
         }
     }
 
     public List<Aluno> getTodosAlunos() {
         return listaAlunos;
     }
-
+    
+    private void salvarEmCSV(Aluno a) {
+    try (PrintWriter pw = new PrintWriter(new FileWriter(csvFile, true))) {
+        pw.printf("%s, %s ;%d;%s; %s;%s%n",
+            a.getMatricula(), a.getNome(), a.getIdade(),
+            sdf.format(a.getDataNasc()), a.getTelefone(), a.getCpf());
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
    
-   
-      private void salvarEmCSV() {
+      private void salvarTudoEmCSV() {
         try (PrintWriter pw = new PrintWriter(new FileWriter(csvFile))) {
             for (Aluno a : listaAlunos) {
                 pw.printf("%s; %s; %d; %s; %s; %s%n",
@@ -85,9 +92,11 @@ public class AlunoController {
                  sdf.format(a.getDataNasc()), a.getTelefone(), a.getCpf());
         }
     } catch (IOException e) {
-        e.printStackTrace();
+        System.out.println("Erro ao criar arquivo: " + e.getMessage());
     }
     }
-
+      public int quantidade(){
+          return listaAlunos.size();
+      }
     }
     

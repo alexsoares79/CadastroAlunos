@@ -4,6 +4,11 @@
  */
 package view;
 
+import controller.AlunoController;
+import java.text.SimpleDateFormat;
+import javax.swing.table.DefaultTableModel;
+import model.Aluno;
+
 /**
  *
  * @author alexa
@@ -15,6 +20,8 @@ public class Listagem extends javax.swing.JFrame {
      */
     public Listagem() {
         initComponents();
+        setLocationRelativeTo(null);
+        carregarTabela();
     }
 
     /**
@@ -27,11 +34,11 @@ public class Listagem extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tabelaAlunos = new javax.swing.JTable();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tabelaAlunos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
@@ -42,7 +49,7 @@ public class Listagem extends javax.swing.JFrame {
                 "Matricula", "Nome", "Idade", "Data de Nascimento", "Telefone", "CPF"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tabelaAlunos);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -92,9 +99,28 @@ public class Listagem extends javax.swing.JFrame {
             }
         });
     }
+    private void carregarTabela() {
+    DefaultTableModel modeloTabela = (DefaultTableModel) tabelaAlunos.getModel();
+    modeloTabela.setRowCount(0); // limpa a tabela antes de preencher
+
+    AlunoController controller = new AlunoController();
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+    for (Aluno a : controller.getTodosAlunos()) {
+        modeloTabela.addRow(new Object[] {
+            a.getMatricula(),
+            a.getNome(),
+            a.getIdade(),
+            sdf.format(a.getDataNasc()),
+            a.getTelefone(),
+            a.getCpf()
+        });
+    }
+}
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tabelaAlunos;
     // End of variables declaration//GEN-END:variables
 }
